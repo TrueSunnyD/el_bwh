@@ -1,4 +1,5 @@
 local QBCore = exports['qb-core']:GetCoreObject()
+
 local discord_webhook = "" -- paste your discord webhook between the quotes if you want to enable discord logs.
 local bancache, namecache = {}, {}
 local open_assists, active_assists = {}, {}
@@ -34,9 +35,7 @@ end
 Citizen.CreateThread(function() -- startup
     sendToDiscord("el_bwh has been started...")
 
-    QBCore.Functions.CreateCallback("el_bwh:ban",
-                                    function(source, cb, target, reason, length,
-                                             offline)
+    QBCore.Functions.CreateCallback("el_bwh:ban", function(source, cb, target, reason, length, offline)
         if not target or not reason then return end
         local trgt = tonumber(target)
         local xPlayer = QBCore.Functions.GetPlayer(source)
@@ -46,9 +45,7 @@ Citizen.CreateThread(function() -- startup
             return
         end
         if isAdmin(xPlayer) then
-            local success, reason = banPlayer(xPlayer,
-                                              offline and target or xTarget,
-                                              reason, length, offline)
+            local success, reason = banPlayer(xPlayer, offline and target or xTarget, reason, length, offline)
             cb(success, reason)
         else
             logUnfairUse(xPlayer);
@@ -219,13 +216,7 @@ AddEventHandler("playerConnecting", function(name, setKick, def)
                       GetPlayerName(source), data.receiver[2], data.length and
                           os.date("%Y-%m-%d %H:%M", data.length) or "PERMANENT",
                       data.id))
-            local kickmsg = Config.banformat:format(data.reason,
-                                                    data.length and
-                                                        os.date(
-                                                            "%Y-%m-%d %H:%M",
-                                                            data.length) or
-                                                        "PERMANENT",
-                                                    data.sender_name, data.id)
+            local kickmsg = Config.banformat:format(data.reason, data.length and os.date("%Y-%m-%d %H:%M", data.length) or "PERMANENT", data.sender_name, data.id)
             if Config.backup_kick_method then
                 print("Droped Player: " .. data.receiver[2])
                 DropPlayer(source, kickmsg)
@@ -245,13 +236,10 @@ AddEventHandler("playerConnecting", function(name, setKick, def)
             end
             if not data["@steam"] then
                 if Config.kick_without_steam then
-                    print("[^1" .. GetCurrentResourceName() ..
-                              "^7] Player connecting without steamid, removing player from server.")
-                    def.done(
-                        "You need to have steam open to play on this server.")
+                    print("[^1" .. GetCurrentResourceName() .."^7] Player connecting without steamid, removing player from server.")
+                    def.done("You need to have steam open to play on this server.")
                 else
-                    print("[^1" .. GetCurrentResourceName() ..
-                              "^7] Player connecting without steamid, skipping identifier storage.")
+                    print("[^1" .. GetCurrentResourceName() .. "^7] Player connecting without steamid, skipping identifier storage.")
                 end
             else
                 exports.oxmysql:insert(
@@ -270,11 +258,9 @@ AddEventHandler("playerConnecting", function(name, setKick, def)
         end
     else
         if Config.backup_kick_method then
-            DropPlayer(source,
-                       "[BWH] No identifiers were found when connecting, please reconnect")
+            DropPlayer(source,"[BWH] No identifiers were found when connecting, please reconnect")
         else
-            def.done(
-                "[BWH] No identifiers were found when connecting, please reconnect")
+            def.done("[BWH] No identifiers were found when connecting, please reconnect")
         end
     end
 end)
@@ -317,16 +303,14 @@ end)
 
 function refreshNameCache()
     namecache = {}
-    for k, v in ipairs(exports.oxmysql:executeSync(
-                           "SELECT license,name FROM bwh_identifiers")) do
+    for k, v in ipairs(exports.oxmysql:executeSync("SELECT license,name FROM bwh_identifiers")) do
         namecache[v.license] = v.name
     end
 end
 
 function refreshBanCache()
     bancache = {}
-    for k, v in ipairs(exports.oxmysql:executeSync(
-                           "SELECT id,receiver,sender,reason,UNIX_TIMESTAMP(length) AS length,unbanned FROM bwh_bans")) do
+    for k, v in ipairs(exports.oxmysql:executeSync("SELECT id,receiver,sender,reason,UNIX_TIMESTAMP(length) AS length,unbanned FROM bwh_bans")) do
         table.insert(bancache, {
             id = v.id,
             sender = v.sender,
@@ -342,8 +326,7 @@ end
 
 function sendToDiscord(msg)
     if discord_webhook ~= "" then
-        PerformHttpRequest(discord_webhook, function(a, b, c) end, "POST",
-                           json.encode({
+        PerformHttpRequest(discord_webhook, function(a, b, c) end, "POST", json.encode({
             embeds = {
                 {
                     title = "BWH Action Log",
@@ -436,21 +419,7 @@ function banPlayer(xPlayer, xTarget, reason, length, offline)
                               "SELECT MAX(id) FROM bwh_bans")
             logAdmin(
                 ("Player ^1%s^7 (%s) got banned by ^1%s^7, expiration: %s, reason: '%s'" ..
-                    (offline and " (OFFLINE BAN)" or "")):format(offline and
-                                                                     offlinename or
-                                                                     xTarget.PlayerData
-                                                                         .name,
-                                                                 offline and
-                                                                     data[1]
-                                                                         .license or
-                                                                     xTarget.PlayerData
-                                                                         .citizenid,
-                                                                 xPlayer.PlayerData
-                                                                     .name,
-                                                                 length ~= nil and
-                                                                     length or
-                                                                     "PERMANENT",
-                                                                 reason))
+                    (offline and " (OFFLINE BAN)" or "")):format(offline and offlinename or xTarget.PlayerData .name, offline and data[1] .license or xTarget.PlayerData .citizenid, xPlayer.PlayerData .name, length ~= nil and length or "PERMANENT", reason))
             if length ~= nil then
                 timestring = length
                 local year, month, day, hour, minute =
@@ -476,17 +445,9 @@ function banPlayer(xPlayer, xTarget, reason, length, offline)
                 xTarget = QBCore.Functions.GetPlayer(targetSource)
             end -- just in case the player is on the server, you never know
             if xTarget then
-                TriggerClientEvent("el_bwh:gotBanned",
-                                   xTarget.PlayerData.source, reason)
+                TriggerClientEvent("el_bwh:gotBanned",  xTarget.PlayerData.source, reason)
                 Citizen.SetTimeout(5000, function()
-                    DropPlayer(xTarget.PlayerData.source,
-                               Config.banformat:format(reason,
-                                                       length ~= nil and
-                                                           timestring or
-                                                           "PERMANENT",
-                                                       xPlayer.PlayerData.name,
-                                                       banid == nil and "1" or
-                                                           banid))
+                    DropPlayer(xTarget.PlayerData.source, Config.banformat:format(reason, length ~= nil and timestring or "PERMANENT", xPlayer.PlayerData.name, banid == nil and "1" or banid))
                 end)
             else
                 return false, "~r~Unknown error (MySQL?)"
@@ -501,9 +462,7 @@ function warnPlayer(xPlayer, xTarget, message, anon)
         {xTarget.PlayerData.license, xPlayer.PlayerData.license, message})
     TriggerClientEvent("el_bwh:receiveWarn", xTarget.PlayerData.source,
                        anon and "" or xPlayer.PlayerData.name, message)
-    logAdmin(("Admin ^1%s^7 warned ^1%s^7 (%s), Message: '%s'"):format(
-                 xPlayer.PlayerData.name, xTarget.PlayerData.name,
-                 xTarget.PlayerData.citizenid, message))
+    logAdmin(("Admin ^1%s^7 warned ^1%s^7 (%s), Message: '%s'"):format( xPlayer.PlayerData.name, xTarget.PlayerData.name, xTarget.PlayerData.citizenid, message))
 end
 
 AddEventHandler("el_bwh:ban", function(sender, target, reason, length, offline)
@@ -536,8 +495,7 @@ RegisterCommand("assist", function(source, args, rawCommand)
                 multiline = Config.chatassistformat:find("\n") ~= nil,
                 args = {
                     "BWH",
-                    Config.chatassistformat:format(GetPlayerName(source),
-                                                   source, reason)
+                    Config.chatassistformat:format(GetPlayerName(source), source, reason)
                 }
             })
         end)
