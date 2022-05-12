@@ -43,5 +43,5 @@ If you like my work, please check out my page, i'll probably release a few more 
 ------------
 Dependencies
 ------------
-qb-core
-oxmysql
+*qb-core
+*oxmysql
