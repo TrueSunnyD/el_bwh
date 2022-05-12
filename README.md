@@ -8,15 +8,17 @@ Original resource Author: Elipse458 Discord server Webpage Original resource
 ------------
 Installation
 ------------
-Download the resource
-Rename it to el_bwh and put it in your resources folder
-Import sql.sql into your database
-Edit the config to your liking
-Add start el_bwh to your server.cfg
-Start it and you're good to go
-Documentation
-There's a few commands this adds:
+1) Download the resource
+2) Rename it to el_bwh and put it in your resources folder
+3) Import sql.sql into your database
+4) Edit the config to your liking
+5) Add start el_bwh to your server.cfg
+6) Start it and you're good to go
 
+-------------
+Documentation
+-------------
+There's a few commands this adds:
 ```
 /bwh <- root admin command, this will display all sub-commands
 /bwh ban <- opens the ban menu
