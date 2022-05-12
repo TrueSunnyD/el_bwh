@@ -17,6 +17,7 @@ Start it and you're good to go
 Documentation
 There's a few commands this adds:
 
+```
 /bwh <- root admin command, this will display all sub-commands
 /bwh ban <- opens the ban menu
 /bwh warn <- opens the warn menu
@@ -30,6 +31,7 @@ There's a few commands this adds:
 /assist <reason> <- player command, players can request help with this
 /cassist <- player command, this cancels the players ongoing assist request
 To unban someone, go to the ban list and scroll far right to the "Actions" section, you'll find a green unban button there
+```
 
 ---------------
 Important Notes
@@ -43,5 +45,7 @@ If you like my work, please check out my page, i'll probably release a few more 
 ------------
 Dependencies
 ------------
-*qb-core
-*oxmysql
+```
+qb-core
+oxmysql
+```
